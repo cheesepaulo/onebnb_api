@@ -6,6 +6,11 @@ services:
     volumes:
       - 'postgres:/var/lib/postgresql/data'
 
+  mailcatcher:
+    image: yappabe/mailcatcher
+    ports:
+        - 1025:1025
+        - 1080:1080
   redis:
     image: 'redis:3.2-alpine'
     command: redis-server
@@ -18,6 +23,7 @@ services:
     depends_on:
       - 'postgres'
       - 'redis'
+      - 'mailcatcher'
     build: .
     ports:
       - '3000:3000'

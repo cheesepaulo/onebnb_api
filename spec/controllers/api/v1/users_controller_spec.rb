@@ -24,6 +24,13 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         @user.reload
         expect(@user.name).to eql(@new_attributes[:name])
       end
+
+      it "updates the requested user with photo" do
+        @attributes_with_photo = @new_attributes.merge!(photo: ('data:image/png;base64,' + Base64.encode64(file_fixture('file.png').read)))
+        put :update, params: {id: @user.id, user: @attributes_with_photo}
+        @user.reload
+        expect(@user.photo.present?).to eql(true)
+      end
     end
 
     context "with invalid token" do

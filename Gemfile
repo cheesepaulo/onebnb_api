@@ -21,10 +21,12 @@ gem 'jbuilder', '~> 2.5'
 
 gem 'devise_token_auth'
 gem 'omniauth'
-
+gem 'cloudinary'
 gem 'carrierwave'
 gem 'carrierwave-base64'
 gem 'mini_magick'
+gem 'geocoder'
+gem 'searchkick'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

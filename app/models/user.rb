@@ -5,4 +5,5 @@ class User < ActiveRecord::Base
           :confirmable, :omniauthable
   include DeviseTokenAuth::Concerns::User
   mount_base64_uploader :photo, PhotoUploader
+  has_many :wishlists
 end

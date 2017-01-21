@@ -9,6 +9,8 @@ require 'ffaker'
 ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
+  # Habilita o nosso Jbuilder nos testes
+  config.render_views = true
   # Nós incluimos o Factory Girl Rails aqui
   config.include FactoryGirl::Syntax::Methods
   # Aqui nos colocamos os Helpers do Devise para nos ajudar na hora de passar o token

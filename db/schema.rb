@@ -10,16 +10,63 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170114023925) do
+ActiveRecord::Schema.define(version: 20170120140543) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "api_v1_properties", force: :cascade do |t|
-    t.string   "title"
-    t.text     "description"
+  create_table "addresses", force: :cascade do |t|
+    t.string   "country"
+    t.string   "state"
+    t.string   "city"
+    t.string   "neighborhood"
+    t.string   "street"
+    t.string   "number"
+    t.string   "zipcode"
+    t.decimal  "latitude"
+    t.decimal  "longitude"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  create_table "facilities", force: :cascade do |t|
+    t.boolean  "wifi"
+    t.boolean  "washing_machine"
+    t.boolean  "clothes_iron"
+    t.boolean  "towels"
+    t.boolean  "air_conditioning"
+    t.boolean  "heater"
+    t.boolean  "refrigerator"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  create_table "photos", force: :cascade do |t|
+    t.integer  "property_id"
+    t.string   "photo"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["property_id"], name: "index_photos_on_property_id", using: :btree
+  end
+
+  create_table "properties", force: :cascade do |t|
+    t.decimal  "price"
+    t.string   "name"
+    t.text     "description"
+    t.integer  "user_id"
+    t.integer  "accommodation_type"
+    t.integer  "guest_max"
+    t.integer  "beds"
+    t.integer  "bedroom"
+    t.integer  "address_id"
+    t.integer  "status"
+    t.integer  "facility_id"
+    t.integer  "bathroom"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+    t.index ["address_id"], name: "index_properties_on_address_id", using: :btree
+    t.index ["facility_id"], name: "index_properties_on_facility_id", using: :btree
+    t.index ["user_id"], name: "index_properties_on_user_id", using: :btree
   end
 
   create_table "users", force: :cascade do |t|
@@ -51,4 +98,19 @@ ActiveRecord::Schema.define(version: 20170114023925) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true, using: :btree
   end
 
+  create_table "wishlists", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "property_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["property_id"], name: "index_wishlists_on_property_id", using: :btree
+    t.index ["user_id"], name: "index_wishlists_on_user_id", using: :btree
+  end
+
+  add_foreign_key "photos", "properties"
+  add_foreign_key "properties", "addresses"
+  add_foreign_key "properties", "facilities"
+  add_foreign_key "properties", "users"
+  add_foreign_key "wishlists", "properties"
+  add_foreign_key "wishlists", "users"
 end

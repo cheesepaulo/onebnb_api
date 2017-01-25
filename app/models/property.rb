@@ -23,7 +23,7 @@ class Property < ApplicationRecord
     clothes_iron: facility.clothes_iron,
     towels: facility.towels,
     air_conditioning: facility.air_conditioning,
-    refrigerato: facility.refrigerator,
+    refrigerator: facility.refrigerator,
     heater: facility.heater
     }
   end

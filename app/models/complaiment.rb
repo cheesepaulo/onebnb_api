@@ -1,0 +1,2 @@
+class Complaiment < ApplicationRecord
+end

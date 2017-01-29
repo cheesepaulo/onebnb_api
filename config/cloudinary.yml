@@ -1,0 +1,19 @@
+---
+development:
+  cloud_name: cheesepaulo
+  api_key: '433269285858995'
+  api_secret: YTL_rbIVIWBwV4UPlzKfhjnZ_Og
+  enhance_image_tag: true
+  static_image_support: false
+production:
+  cloud_name: cheesepaulo
+  api_key: '433269285858995'
+  api_secret: YTL_rbIVIWBwV4UPlzKfhjnZ_Og
+  enhance_image_tag: true
+  static_image_support: true
+test:
+  cloud_name: cheesepaulo
+  api_key: '433269285858995'
+  api_secret: YTL_rbIVIWBwV4UPlzKfhjnZ_Og
+  enhance_image_tag: true
+  static_image_support: false

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170129215507) do
+ActiveRecord::Schema.define(version: 20170201033924) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,8 +87,9 @@ ActiveRecord::Schema.define(version: 20170129215507) do
     t.integer  "status"
     t.integer  "facility_id"
     t.integer  "bathroom"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.integer  "rating",             default: 0
     t.index ["address_id"], name: "index_properties_on_address_id", using: :btree
     t.index ["facility_id"], name: "index_properties_on_facility_id", using: :btree
     t.index ["user_id"], name: "index_properties_on_user_id", using: :btree
@@ -136,6 +137,8 @@ ActiveRecord::Schema.define(version: 20170129215507) do
     t.datetime "updated_at",                               null: false
     t.string   "photo"
     t.integer  "kind"
+    t.integer  "address_id"
+    t.index ["address_id"], name: "index_users_on_address_id", using: :btree
     t.index ["email"], name: "index_users_on_email", using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true, using: :btree
@@ -154,6 +157,7 @@ ActiveRecord::Schema.define(version: 20170129215507) do
   add_foreign_key "properties", "addresses"
   add_foreign_key "properties", "facilities"
   add_foreign_key "properties", "users"
+  add_foreign_key "users", "addresses"
   add_foreign_key "wishlists", "properties"
   add_foreign_key "wishlists", "users"
 end

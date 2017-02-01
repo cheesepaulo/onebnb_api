@@ -11,6 +11,8 @@ class Property < ApplicationRecord
   has_many :photos
   searchkick
 
+  validates_presence_of :user
+
   def search_data
     {
     status: status,

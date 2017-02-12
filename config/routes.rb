@@ -15,6 +15,13 @@ Rails.application.routes.draw do
           delete 'wishlist', to: 'properties#remove_from_wishlist'
         end
       end
+
+      resources :reservations do
+        member do
+          post 'evaluation', to: 'reservation#evaluation'
+        end
+      end
+
     end
   end
 end

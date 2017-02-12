@@ -9,4 +9,5 @@ class User < ActiveRecord::Base
   enum kind: [ :user, :admin ]
   has_many :comments
   belongs_to :address
+  has_many :reservations
 end

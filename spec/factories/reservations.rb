@@ -1,9 +1,10 @@
 FactoryGirl.define do
   factory :reservation do
-    property_id 1
-    user_id 1
-    checkin_date "2017-01-29"
-    checkout_date "2017-01-29"
-    status 1
+    property
+    user
+    checkin_date Time.now - 10.day
+    checkout_date Time.now + 10.day
+    status { rand(0..3) } # :active, :pending, :inactive, :blocked
+    evaluation FFaker::Boolean::maybe
   end
 end

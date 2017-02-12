@@ -1,6 +1,37 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::UsersController, type: :controller do
+
+  describe "GET #current_user" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "with valid params and tokens" do
+      before do
+        # Aqui nós estamos colocando no header os tokens (Sem isso a chamada seria bloqueada)
+        request.headers.merge!(@auth_headers)
+      end
+
+      it "get the current user" do
+        get :current_user
+        expect(JSON.parse(response.body)["email"]).to eql(@user.email)
+      end
+    end
+
+    context "with invalid params and tokens" do
+      before do
+      end
+
+      it "get a status 401" do
+        get :current_user
+        expect(response.status).to eql(401)
+      end
+    end
+  end
+
   describe "PUT #update" do
     before do
       @user = create(:user)

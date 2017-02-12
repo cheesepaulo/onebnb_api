@@ -36,4 +36,8 @@ class Property < ApplicationRecord
       heater: facility.heater
     }
   end
+
+  def get_rating
+    self.rating.round
+  end
 end

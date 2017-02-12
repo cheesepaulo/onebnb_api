@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   mount_base64_uploader :photo, PhotoUploader
   has_many :wishlists
   enum kind: [ :user, :admin ]
+  enum gender: [ :man, :woman ]
   has_many :comments
   belongs_to :address
   has_many :reservations

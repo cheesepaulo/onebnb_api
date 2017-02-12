@@ -103,4 +103,41 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
       end
     end
   end
+
+  describe "GET #autocomplete" do
+    before do
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "with 2 existing properties and 1 active" do
+      before do
+        @property1 = create(:property, status: :active)
+        @property2 = create(:property, status: :inactive)
+      end
+
+      it "return 3 elements of result" do
+        get :autocomplete
+        expect(JSON.parse(response.body).count).to eql(3)
+      end
+
+      it "return name of Property, city and country of property in 3 first elements" do
+        get :autocomplete
+        expect(JSON.parse(response.body)[0]).to eql(@property1.name)
+        expect(JSON.parse(response.body)[1]).to eql(@property1.address.city)
+        expect(JSON.parse(response.body)[2]).to eql(@property1.address.country)
+      end
+    end
+
+    context "with 2 existing properties and 0 active" do
+      before do
+        @property1 = create(:property, status: :inactive)
+        @property2 = create(:property, status: :inactive)
+      end
+
+      it "return 0 elements of result" do
+        get :autocomplete
+        expect(JSON.parse(response.body).count).to eql(0)
+      end
+    end
+  end
 end

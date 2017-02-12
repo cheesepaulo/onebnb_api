@@ -21,6 +21,7 @@ class Property < ApplicationRecord
 
   def search_data
     {
+      name: name,
       status: status,
       address_country: address.country,
       address_city: address.city,

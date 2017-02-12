@@ -12,5 +12,9 @@ FactoryGirl.define do
     status { rand(0..3) } # :active, :pending, :inactive, :blocked
     facility
     bathroom { rand(1..10) }
+
+    before(:create) do |property|
+      property.photos << FactoryGirl.create(:photo)
+    end
   end
 end

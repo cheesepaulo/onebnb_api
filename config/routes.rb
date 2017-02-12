@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       mount_devise_token_auth_for 'User', at: 'auth'
       get 'users/wishlist', to: 'users#wishlist'
 
+      get 'autocomplete', to: 'properties#autocomplete'
       get 'search', to: 'properties#search'
       resources :users, only: [:update]
 

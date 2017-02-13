@@ -1,5 +1,5 @@
 json.property do
-  json.extract! api_v1_property, :id, :price, :name, :description, :user_id, :accommodation_type , :guest_max, :beds, :bedroom, :status , :bathroom , :rating, :created_at , :updated_at
+  json.extract! api_v1_property, :id, :price, :name, :description, :user_id, :accommodation_type , :guest_max, :beds, :bedroom, :status , :bathroom , :rating, :priority, :created_at , :updated_at
 
   json.address do
     json.extract! api_v1_property.address, :id, :country, :city, :neighborhood, :street, :number, :zipcode, :latitude, :longitude, :created_at, :updated_at, :state

@@ -1,6 +1,51 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::PropertiesController, type: :controller do
+  describe "GET #featured" do
+      before do
+        request.env["HTTP_ACCEPT"] = 'application/json'
+      end
+
+      context "with 5 existing properties and 3 with priority" do
+        before do
+          @property1 = create(:property, status: :active, priority: true)
+          @property2 = create(:property, status: :active, priority: true)
+          @property3 = create(:property, status: :active, priority: true)
+          @property4 = create(:property, status: :active, priority: false)
+          @property5 = create(:property, status: :active, priority: false)
+        end
+
+        it "return 3 elements of result" do
+          get :featured
+          expect(JSON.parse(response.body).count).to eql(3)
+        end
+
+        it "return the 3 properties thar are priority" do
+          get :featured
+          expect(JSON.parse(response.body)[0]["property"]["priority"]).to eql(true)
+          expect(JSON.parse(response.body)[1]["property"]["priority"]).to eql(true)
+          expect(JSON.parse(response.body)[2]["property"]["priority"]).to eql(true)
+        end
+      end
+
+      context "with 5 properties and 2 with priority" do
+        before do
+          @property1 = create(:property, status: :active, priority: true)
+          @property2 = create(:property, status: :active, priority: true)
+          @property3 = create(:property, status: :active, priority: false)
+          @property4 = create(:property, status: :active, priority: false)
+          @property5 = create(:property, status: :active, priority: false)
+        end
+
+        it "return 2 properties with priority and 1 without priority" do
+          get :featured
+          expect(JSON.parse(response.body)[0]["property"]["priority"]).to eql(true)
+          expect(JSON.parse(response.body)[1]["property"]["priority"]).to eql(true)
+          expect(JSON.parse(response.body)[2]["property"]["priority"]).to eql(false)
+        end
+      end
+    end
+
   describe "POST #wishlist" do
     before do
       @user = create(:user)

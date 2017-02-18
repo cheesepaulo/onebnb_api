@@ -3,8 +3,14 @@ class Reservation < ApplicationRecord
   belongs_to :property
   belongs_to :user
 
+  has_many :talks
+
   # Força a ter esses campos preenchidos para criar um Reservation
   validates_presence_of :property, :user
+
+  def interval_of_days
+    (self.checkout_date - self.checkin_date).to_i
+  end
 
   def evaluate comment, new_rating
     Reservation.transaction do

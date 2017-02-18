@@ -19,6 +19,7 @@ gem 'jbuilder', '~> 2.5'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
+gem 'will_paginate'
 gem 'devise_token_auth'
 gem 'omniauth'
 gem 'cloudinary'

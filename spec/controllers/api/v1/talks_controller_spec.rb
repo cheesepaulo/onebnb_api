@@ -2,6 +2,54 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::TalksController, type: :controller do
 
+  describe "POST #create_message" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "with valid params and existing talk" do
+
+      before do
+        request.headers.merge!(@auth_headers)
+        @talk = create(:talk, user: @user)
+      end
+
+      it "The talk have a message associated" do
+        post :create_message, params: {id: @talk.id, body: FFaker::Lorem.word}
+        @talk.reload
+        expect(@talk.messages.count).to eql(1)
+      end
+
+      it "the last message from conversation have the right body" do
+        body = FFaker::Lorem.word
+        post :create_message, params: {id: @talk.id, body: body}
+        @talk.reload
+        expect(@talk.messages.last.body).to eql(body)
+      end
+    end
+
+    context "with valid params and without talk" do
+
+      before do
+        request.headers.merge!(@auth_headers)
+        @property = create(:property)
+      end
+
+      it "A talk are created" do
+        post :create_message, params: {property_id: @property.id, body: FFaker::Lorem.word}
+        expect(Talk.all.count).to eql(1)
+      end
+
+      it "the last message from conversation have the right body" do
+        body = FFaker::Lorem.word
+        post :create_message, params: {property_id: @property.id, body: body}
+        expect(Talk.last.messages.last.body).to eql(body)
+      end
+    end
+  end
+
   describe "GET #messages" do
     before do
       @user = create(:user)

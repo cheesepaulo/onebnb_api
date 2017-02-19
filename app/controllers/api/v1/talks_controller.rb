@@ -14,7 +14,24 @@ class Api::V1::TalksController < ApplicationController
                   .paginate(:page => page, :per_page => 8)
   end
 
-  def messages  
+  def messages
+  end
+
+  def create_message
+    begin
+    # Pega o talk ou caso ele ainda não exista, cria.
+      if params[:id]
+        set_api_v1_talk
+      elsif params[:property_id]
+        @talk = Talk.create(property: Property.find(params[:property_id]), user: current_api_v1_user)
+      else
+        raise "Without the correct parameters"
+      end
+      @talk.messages << Message.create(body: params[:body], user: current_api_v1_user)
+      render json: {success: true}, status: 200
+    rescue Exception => errors
+      render json: errors, status: :unprocessable_entity
+    end
   end
 
 

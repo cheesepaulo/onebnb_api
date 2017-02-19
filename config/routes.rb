@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
 
+      post 'talks/(:id)/messages/', to: 'talks#create_message'
       resources :talks do
         member do
           get 'messages', to: 'talks#messages'

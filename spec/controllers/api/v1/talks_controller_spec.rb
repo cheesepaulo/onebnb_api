@@ -2,6 +2,88 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::TalksController, type: :controller do
 
+  describe "GET #messages" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "with invalid user" do
+
+      before do
+        request.headers.merge!(@auth_headers)
+        @user2 = create(:user)
+        @talk = create(:talk, user: @user2)
+        create(:message, talk: @talk)
+      end
+
+      it "will receive status 401" do
+        get :messages, id: @talk.id
+        expect(response.status).to eql(401)
+      end
+    end
+
+    context "with valid params and 10 messages" do
+
+      before do
+        request.headers.merge!(@auth_headers)
+        @talk = create(:talk, user: @user)
+        10.times do
+          create(:message, talk: @talk)
+        end
+      end
+
+      it "will receive 10 messages" do
+        get :messages, id: @talk.id
+        expect(JSON.parse(response.body)['talk']['messages'].count).to eql(10)
+      end
+
+      it "The last message is the first created" do
+        get :messages, id: @talk.id
+        expect(JSON.parse(response.body)['talk']['messages'].last['id']).to eql(Message.first.id)
+      end
+
+      it "The message comes with User" do
+        get :messages, id: @talk.id
+        message = JSON.parse(response.body)['talk']['messages'][0]
+        expect(message['user']['id'].present?).to eql(true)
+      end
+    end
+
+    context "with valid params and a reservation associated" do
+
+      before do
+        request.headers.merge!(@auth_headers)
+        @reservation = create(:reservation)
+        @talk = create(:talk, user: @user, reservation: @reservation)
+        @message = create(:message, talk: @talk)
+      end
+
+      it "will return the right reservation" do
+        get :messages, id: @talk.id
+        reservation = JSON.parse(response.body)['talk']['reservation']
+        expect(reservation['id']).to eql(@reservation.id)
+      end
+    end
+
+    context "with valid params and zero reservation associated" do
+
+      before do
+        request.headers.merge!(@auth_headers)
+        @talk = create(:talk, user: @user, reservation: nil)
+        @message = create(:message, talk: @talk)
+      end
+
+      it "will return the right reservation" do
+        get :messages, id: @talk.id
+        reservation = JSON.parse(response.body)['talk']['reservation']
+        expect(reservation).to eql(nil)
+      end
+    end
+  end
+
+
   describe "GET #index" do
     before do
       @user = create(:user)

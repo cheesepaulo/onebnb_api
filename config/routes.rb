@@ -2,7 +2,11 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
 
-      resources :talks
+      resources :talks do
+        member do
+          get 'messages', to: 'talks#messages'
+        end
+      end
 
       mount_devise_token_auth_for 'User', at: 'auth'
       get 'users/wishlist', to: 'users#wishlist'

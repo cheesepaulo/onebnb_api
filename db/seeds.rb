@@ -128,3 +128,21 @@ property.photos << p20
 property.save!
 
 Property.reindex
+
+r1 = Reservation.create(property: Property.all[10], user: u1, checkin_date: Time.now + 10.days, checkout_date: Time.now + 30.days, status: :active)
+
+t1 = Talk.create(property: Property.all[10], user: u1, reservation: r1)
+
+Message.create(talk: t1, user: u1, body: 'Hey')
+Message.create(talk: t1, user: u2, body: 'Hello')
+
+Message.create(talk: t1, user: u1, body: 'I want rent your property')
+Message.create(talk: t1, user: u2, body: 'Sure, you can get the details in Property Details')
+
+t2 = Talk.create(property: Property.all[0], user: u2)
+
+Message.create(talk: t2, user: u2, body: 'Hey')
+Message.create(talk: t2, user: u1, body: 'Hello')
+
+Message.create(talk: t2, user: u2, body: 'I want rent your property')
+Message.create(talk: t2, user: u1, body: 'Sure, you can get the details in Property Details')

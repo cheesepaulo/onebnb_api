@@ -31,7 +31,6 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
         expect(@reservation.checkout_date).to eql(new_reservation_params[:reservation][:checkout_date])
         expect(@reservation.user).to eql(@user)
       end
-      # (Criar o teste) return a json with correspondents fields
     end
   end
 

@@ -1,6 +1,6 @@
-class Api::V1::ReservationController < ApplicationController
+class Api::V1::ReservationsController < ApplicationController
   before_action :set_api_v1_reservation, only: [:evaluation]
- 
+
   # POST /evaluation
   # POST /evaluation.json
   def evaluation

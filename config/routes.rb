@@ -17,7 +17,7 @@ Rails.application.routes.draw do
 
       resources :reservations do
         member do
-          post 'evaluation', to: 'reservation#evaluation'
+          post 'evaluation', to: 'reservations#evaluation'
         end
       end
       get 'featured', to: 'properties#featured'

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Api::V1::ReservationController, type: :controller do
+RSpec.describe Api::V1::ReservationsController, type: :controller do
   describe "GET #evaluation" do
     before do
       @user = create(:user)

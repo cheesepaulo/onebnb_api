@@ -1,5 +1,5 @@
 class Api::V1::ReservationsController < ApplicationController
-  before_action :set_api_v1_reservation, only: [:evaluation]
+  before_action :set_api_v1_reservation, only: [:evaluation, :create]
 
   # POST /evaluation
   # POST /evaluation.json
@@ -26,6 +26,10 @@ class Api::V1::ReservationsController < ApplicationController
 
     def set_api_v1_reservation
       @api_v1_reservation = Reservation.where(id: params[:id], user: current_api_v1_user).last
+    end
+
+    def reservation_params
+      params.require(:reservation).permit(:property_id, :checkin_date, :checkout_date).merge(user_id: current_api_v1_user.id)
     end
 
     def evaluation_params

@@ -12,6 +12,16 @@ class Api::V1::ReservationsController < ApplicationController
     end
   end
 
+  # POST /api/v1/reservation.json
+  def create
+    @api_v1_reservation = Reservation.new(reservation_params)
+    if @api_v1_reservation.save
+      render :show, status: :created
+    else
+      render json: @api_v1_reservation.errors, status: :unprocessable_entity
+    end
+  end
+
   private
 
     def set_api_v1_reservation

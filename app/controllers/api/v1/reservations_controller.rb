@@ -1,6 +1,17 @@
 class Api::V1::ReservationsController < ApplicationController
   before_action :set_api_v1_reservation, only: [:evaluation, :create]
 
+  # GET /get_by_property
+  # GET /get_by_property.json
+  def get_by_property
+    begin
+      @api_v1_reservation = current_api_v1_user.properties.find(params[:id]).reservations
+      render template: '/api/v1/reservations/index', status: 200
+    rescue Exception => errors
+      render json: errors, status: :unprocessable_entity
+    end
+  end
+
   # POST /evaluation
   # POST /evaluation.json
   def evaluation

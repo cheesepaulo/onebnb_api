@@ -1,6 +1,30 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::ReservationsController, type: :controller do
+  describe "GET #get_by_property" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "with valid params and 4 reservations" do
+      before do
+        request.headers.merge!(@auth_headers)
+        @property1 = create(:property, status: :active, rating: 5, user: @user)
+        @reservation1 = create(:reservation, property: @property1, evaluation: true)
+        @reservation2 = create(:reservation, property: @property1, evaluation: true)
+        @reservation3 = create(:reservation, property: @property1, evaluation: true)
+        @reservation4 = create(:reservation, property: @property1, evaluation: true)
+      end
+
+      it "receive 4 reservations" do
+        get :get_by_property, params: {id: @property1.id}
+        expect(JSON.parse(response.body).count).to eql(4)
+      end
+    end
+  end
+
   describe "POST #create" do
     before do
       @user = create(:user)

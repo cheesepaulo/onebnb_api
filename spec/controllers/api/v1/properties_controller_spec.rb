@@ -12,8 +12,8 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
       before do
         @property1 = create(:property, status: :active, user: @user)
         @property2 = create(:property, status: :active, user: @user)
-        @property3 = create(:property, status: :active, user: @user)
-        @property4 = create(:property, status: :active, user: @user)
+        @property3 = create(:property, status: :inactive, user: @user)
+        @property4 = create(:property, status: :inactive, user: @user)
 
         @reservation1 = create(:reservation, property: @property1, status: :pending)
         @reservation2 = create(:reservation, property: @property2, status: :pending)

@@ -1,6 +1,68 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::PropertiesController, type: :controller do
+  describe "GET #trips" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "with 2 reservations active, 2 reservations pending, 2 reservations finished and 2 properties in wishlist" do
+      before do
+        @property1 = create(:property, status: :active, priority: true)
+        @property2 = create(:property, status: :active, priority: true)
+        @property3 = create(:property, status: :active, priority: true)
+        @property4 = create(:property, status: :active, priority: false)
+        @property5 = create(:property, status: :active, priority: false)
+        @property6 = create(:property, status: :active, priority: false)
+        @property7 = create(:property, status: :active, priority: false)
+        @property8 = create(:property, status: :active, priority: false)
+
+        @pending1 = create(:reservation, property: @property1, user: @user, status: :pending)
+        @pending2 = create(:reservation, property: @property2, user: @user, status: :pending)
+
+        @next1 = create(:reservation, property: @property3, user: @user, status: :active)
+        @next2 = create(:reservation, property: @property4, user: @user, status: :active)
+
+        @previous1 = create(:reservation, property: @property5, user: @user, status: :finished)
+        @previous2 = create(:reservation, property: @property6, user: @user, status: :finished)
+
+        @wishlist1 = Wishlist.create(user: @user, property: @property7)
+        @wishlist2 = Wishlist.create(user: @user, property: @property8)
+        request.headers.merge!(@auth_headers)
+      end
+
+      it "return 2 properties in 'next' trips and right properties" do
+        get :trips
+        expect(JSON.parse(response.body)["trips"]["next"].count).to eql(2)
+        expect(JSON.parse(response.body)["trips"]["next"][0]['id']).to eql(@next1.property.id)
+        expect(JSON.parse(response.body)["trips"]["next"][1]['id']).to eql(@next2.property.id)
+      end
+
+      it "return 2 properties in 'previous' trips" do
+        get :trips
+        expect(JSON.parse(response.body)["trips"]["previous"].count).to eql(2)
+        expect(JSON.parse(response.body)["trips"]["previous"][0]['id']).to eql(@previous1.property.id)
+        expect(JSON.parse(response.body)["trips"]["previous"][1]['id']).to eql(@previous2.property.id)
+      end
+
+      it "return 2 properties in 'pending' trips" do
+        get :trips
+        expect(JSON.parse(response.body)["trips"]["pending"].count).to eql(2)
+        expect(JSON.parse(response.body)["trips"]["pending"][0]['id']).to eql(@pending1.property.id)
+        expect(JSON.parse(response.body)["trips"]["pending"][1]['id']).to eql(@pending2.property.id)
+      end
+
+      it "return 2 properties in the wishlist" do
+        get :trips
+        expect(JSON.parse(response.body)["trips"]["wishlist"].count).to eql(2)
+        expect(JSON.parse(response.body)["trips"]["wishlist"][0]['id']).to eql(@wishlist1.property.id)
+        expect(JSON.parse(response.body)["trips"]["wishlist"][1]['id']).to eql(@wishlist2.property.id)
+      end
+    end
+  end
+
   describe "GET #featured" do
       before do
         request.env["HTTP_ACCEPT"] = 'application/json'

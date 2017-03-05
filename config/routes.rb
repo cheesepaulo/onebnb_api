@@ -20,9 +20,11 @@ Rails.application.routes.draw do
           post 'evaluation', to: 'reservations#evaluation'
         end
       end
+
       get 'featured', to: 'properties#featured'
       get 'autocomplete', to: 'properties#autocomplete'
       get 'search', to: 'properties#search'
+      get 'trips', to: 'properties#trips'
       resources :properties do
         member do
           post   'wishlist', to: 'properties#add_to_wishlist'

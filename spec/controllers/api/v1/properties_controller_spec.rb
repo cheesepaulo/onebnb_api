@@ -1,6 +1,43 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::PropertiesController, type: :controller do
+  describe "GET #my_properties" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "with 4 properties of the current_user" do
+      before do
+        @property1 = create(:property, status: :active, user: @user)
+        @property2 = create(:property, status: :active, user: @user)
+        @property3 = create(:property, status: :active, user: @user)
+        @property4 = create(:property, status: :active, user: @user)
+
+        @reservation1 = create(:reservation, property: @property1, status: :pending)
+        @reservation2 = create(:reservation, property: @property2, status: :pending)
+        @reservation3 = create(:reservation, property: @property3, status: :pending)
+        @reservation4 = create(:reservation, property: @property4, status: :pending)
+
+        request.headers.merge!(@auth_headers)
+      end
+
+      it "return 4 properties" do
+        get :my_properties
+        expect(JSON.parse(response.body).count).to eql(4)
+      end
+
+      it "return by last reservation order" do
+        get :my_properties
+        expect(@property1.id).to eql(JSON.parse(response.body)[3]["property"]["id"])
+        expect(@property2.id).to eql(JSON.parse(response.body)[2]["property"]["id"])
+        expect(@property3.id).to eql(JSON.parse(response.body)[1]["property"]["id"])
+        expect(@property4.id).to eql(JSON.parse(response.body)[0]["property"]["id"])
+      end
+    end
+  end
+
   describe "GET #trips" do
     before do
       @user = create(:user)

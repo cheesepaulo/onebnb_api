@@ -23,6 +23,16 @@ class Api::V1::PropertiesController < ApplicationController
     render json: results, status: 200
   end
 
+  # GET /api/v1/my_properties
+  # GET /api/v1/my_properties.json
+  def my_properties
+    @api_v1_properties = current_api_v1_user.properties.
+                                      includes(:reservations).
+                                      order("reservations.created_at DESC")
+
+    render template: '/api/v1/properties/index', status: 200
+  end
+
   # GET /api/v1/trips.json
   def trips
     begin

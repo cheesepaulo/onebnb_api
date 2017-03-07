@@ -28,6 +28,9 @@ f2 = Facility.create wifi: false, washing_machine: false
 u1 = User.create email: "fake@teste.com", password: "12345678", name: "Fake Guy", photo: open("db/seed_images/steve.jpg"), address: a1, confirmed_at: Time.now
 u2 = User.create email: "nobody@teste.com", password: "12345678", name: "Mr Nobody", photo: open("db/seed_images/bill.jpeg"), address: a2, confirmed_at: Time.now
 
+User.create email: 'user@onebnb.com', password: '12345678', kind: 0
+User.create email: 'admin@onebnb.com', password: '12345678', kind: 1
+
 c1 = Comment.create body: 'Hey You Im just a little comment to be a example in this awesome APP', user: u1
 c2 = Comment.create body: 'Hey You Im just a little comment to be a example in this awesome APP', user: u1
 c3 = Comment.create body: 'Hey You Im just a little comment to be a example in this awesome APP', user: u1

@@ -27,6 +27,7 @@ class Property < ApplicationRecord
     {
       name: name,
       status: status,
+      accommodation_type: accommodation_type,
       address_country: address.country,
       address_city: address.city,
       address_state: address.state,

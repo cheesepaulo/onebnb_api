@@ -14,7 +14,6 @@ if @talk.reservation
     # Devolve a quantidade de dias da reserva
     json.interval_of_days @talk.reservation.interval_of_days
     # Devolve o preço baseado na quantidade de dias e no preço diario da Propriedade
-    # TODO: Mudar no futuro para que use o preço que for gerado quando o reserva for aceita
     json.price (@talk.reservation.interval_of_days * @talk.reservation.property.price)
 
     json.address do

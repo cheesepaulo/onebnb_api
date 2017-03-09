@@ -236,12 +236,28 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
 
       it "receive one result when property is active and wifi is enable" do
         @address = create(:address, city: 'Sao Paulo')
+
         @facility = create(:facility, wifi: true)
         @property = create(:property, address: @address, status: :active, facility: @facility)
+
+        @facility2 = create(:facility, wifi: false)
+        @property2 = create(:property, address: @address, status: :active, facility: @facility2)
         # Force reindex
         Property.reindex
 
         get :search, params: {search: 'Sao Paulo', wifi: true}
+        expect(JSON.parse(response.body).count).to eql(1)
+      end
+
+      it "receive one result when property is active and accommodation_type is wholehouse" do
+        @address = create(:address, city: 'Sao Paulo')
+        @property1 = create(:property, address: @address, status: :active, accommodation_type: :whole_house)
+        @property2 = create(:property, address: @address, status: :active, accommodation_type: :whole_bedroom)
+        # Force reindex
+        Property.reindex
+
+        get :search, params: {search: 'Sao Paulo', accommodation_type: :whole_house}
+        expect(JSON.parse(response.body)[0]["property"]["accommodation_type"]).to eql("whole_house")
         expect(JSON.parse(response.body).count).to eql(1)
       end
     end

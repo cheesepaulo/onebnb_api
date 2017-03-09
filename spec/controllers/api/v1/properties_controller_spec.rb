@@ -233,6 +233,17 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         get :search, params: {search: 'Sao Paulo'}
         expect(JSON.parse(response.body).count).to eql(0)
       end
+
+      it "receive one result when property is active and wifi is enable" do
+        @address = create(:address, city: 'Sao Paulo')
+        @facility = create(:facility, wifi: true)
+        @property = create(:property, address: @address, status: :active, facility: @facility)
+        # Force reindex
+        Property.reindex
+
+        get :search, params: {search: 'Sao Paulo', wifi: true}
+        expect(JSON.parse(response.body).count).to eql(1)
+      end
     end
 
     context "without a property associated a search query" do

@@ -73,18 +73,29 @@ class Api::V1::PropertiesController < ApplicationController
 
   # GET /api/v1/search
   def search
+    # puts params[:wifi].to_b.class
     # Caso o usuário não coloque nenhuma informação pesquisamos por qualquer uma
     search_condition = params[:search] || '*'
     # Caso não esteja sendo selecionado por página, pegamos a primeira
     page = params[:page] || 1
     # Filtra por status, presença de wifi, máquina de lavar e etc
-    # Faça você mesmo \o/
     conditions = {status: :active}
+
+    # Se o parâmetro estiver presente converte a string true/false para boolean e adiciona ao array de conditions
+    conditions['wifi'] = params[:wifi].to_b if params[:wifi].present?
+    conditions['washing_machine'] = params[:washing_machine].to_b if params[:washing_machine].present?
+    conditions['clothes_iron'] = params[:clothes_iron].to_b if params[:clothes_iron].present?
+    conditions['towels'] = params[:towels].to_b if params[:towels].present?
+    conditions['air_conditioning'] = params[:air_conditioning].to_b if params[:air_conditioning].present?
+    conditions['refrigerato'] = params[:refrigerato].to_b if params[:refrigerato].present?
+    conditions['heater'] = params[:heater].to_b if params[:heater].present?
+
 
     # Realizamos a busca do ElasticSearch
     @api_v1_properties = (Property.search search_condition, where: conditions,  page: page, per_page: 18)
     render template: '/api/v1/properties/index', status: 200
   end
+
 
   # POST /api/v1/properties.json
   def create

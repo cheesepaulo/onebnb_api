@@ -45,3 +45,13 @@ class Property < ApplicationRecord
     self.rating.round
   end
 end
+
+class String
+     def to_b
+     if self == "false"
+        false
+     else
+       true
+     end
+  end
+end

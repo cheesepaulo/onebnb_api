@@ -256,7 +256,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         # Force reindex
         Property.reindex
 
-        get :search, params: {search: 'Sao Paulo', accommodation_type: :whole_house}
+        get :search, params: {search: 'Sao Paulo', whole_house: true}
         expect(JSON.parse(response.body)[0]["property"]["accommodation_type"]).to eql("whole_house")
         expect(JSON.parse(response.body).count).to eql(1)
       end

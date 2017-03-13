@@ -1,6 +1,14 @@
 class Api::V1::ReservationsController < ApplicationController
   before_action :set_api_v1_reservation, only: [:evaluation, :create]
 
+  # GET /api/v1/my_reservations
+  # GET /api/v1/my_reservations.json
+  def my_reservations
+    @api_v1_properties = current_api_v1_user.reservations.
+                                      order("reservations.created_at DESC")
+    render template: '/api/v1/reservations/index', status: 200
+  end
+
   # GET /get_by_property
   # GET /get_by_property.json
   def get_by_property

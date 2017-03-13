@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       get 'current_user', to: 'users#current_user'
 
       get 'get_by_property', to: 'reservations#get_by_property'
+      get 'my_reservations', to: 'reservations#my_reservations'
       resources :reservations do
         member do
           post 'evaluation', to: 'reservations#evaluation'

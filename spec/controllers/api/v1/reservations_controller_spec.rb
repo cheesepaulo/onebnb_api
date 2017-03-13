@@ -58,11 +58,12 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
 
       it "create a reservation with correspondents json fields" do
         post :create, params: {reservation: {property_id: @property1.id, checkin_date: Date.today - 10.day, checkout_date: Date.today + 10.day}}
-
-        get :get_by_property, params: {id: @property1.id}
         @reservation = Reservation.last
+        get :my_reservations
 
-        expect(@reservation.property_id).to eql(JSON.parse(response.body)[0]["property"]["id"])
+
+        expect(JSON.parse(response.body).count).to eql(1)
+        expect(JSON.parse(response.body)[0]["property"]["id"]).to eql(@reservation.property_id)
         # expect(@reservation.checkin_date).to eql(JSON.parse(response.body)[0]["reservation"]["checkin_date"])
         # expect(@reservation.checkout_date).to eql(JSON.parse(response.body)[0]["reservation"]["checkout_date"])
         # expect(@reservation.user).to eql(JSON.parse(response.body)[0]["user"])

@@ -73,8 +73,7 @@ class Api::V1::PropertiesController < ApplicationController
 
   # GET /api/v1/search
   def search
-    binding.pry
-    # puts params[:wifi].to_b.class
+
     # Caso o usuário não coloque nenhuma informação pesquisamos por qualquer uma
     search_condition = params[:search] || '*'
     # Caso não esteja sendo selecionado por página, pegamos a primeira
@@ -82,7 +81,6 @@ class Api::V1::PropertiesController < ApplicationController
     # Filtra por status, presença de wifi, máquina de lavar e etc
     conditions = {status: :active}
 
-    # Se o parâmetro estiver presente converte a string true/false para boolean e adiciona ao array de conditions
     conditions['wifi'] = params[:wifi].to_b if params[:wifi].present?
     conditions['washing_machine'] = params[:washing_machine].to_b if params[:washing_machine].present?
     conditions['clothes_iron'] = params[:clothes_iron].to_b if params[:clothes_iron].present?
@@ -91,14 +89,9 @@ class Api::V1::PropertiesController < ApplicationController
     conditions['refrigerato'] = params[:refrigerato].to_b if params[:refrigerato].present?
     conditions['heater'] = params[:heater].to_b if params[:heater].present?
 
-    # conditions['accommodation_type'] = params[:accommodation_type] if params[:accommodation_type].present?
-
     conditions['accommodation_type'] = 'whole_house' if params[:whole_house] == 'true'
     conditions['accommodation_type'] = 'whole_bedroom' if params[:whole_bedroom] == 'true'
     conditions['accommodation_type'] = 'shared_bedroom' if params[:shared_bedroom] == 'true'
-
-    puts conditions
-    puts params[:whole_house]
 
     # Realizamos a busca do ElasticSearch
     @api_v1_properties = (Property.search search_condition, where: conditions,  page: page, per_page: 18)

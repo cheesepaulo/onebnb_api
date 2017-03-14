@@ -234,7 +234,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         expect(JSON.parse(response.body).count).to eql(0)
       end
 
-      it "receive one result when property is active and wifi is enable" do
+      it "it receive one result when property is active and wifi is enable" do
         @address = create(:address, city: 'Sao Paulo')
 
         @facility = create(:facility, wifi: true)

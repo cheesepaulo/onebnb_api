@@ -22,6 +22,23 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
         get :get_by_property, params: {id: @property1.id}
         expect(JSON.parse(response.body).count).to eql(4)
       end
+
+      it "get a reservation with correspondents json fields" do
+        get :get_by_property, params: {id: @property1.id}
+        @reservation = Reservation.last
+
+        puts @reservation.user.id
+        puts JSON.parse(response.body)[3]
+        # o user id é igual ao retornado no response
+
+        expect(JSON.parse(response.body).count).to eql(4)
+        expect(JSON.parse(response.body)[3]["property_id"]).to eql(@reservation.property_id)
+        expect(JSON.parse(response.body)[3]["checkin_date"]).to eql(@reservation.checkin_date.strftime)
+        expect(JSON.parse(response.body)[3]["checkout_date"]).to eql(@reservation.checkout_date.strftime)
+        expect(JSON.parse(response.body)[3]["user"]["user_id"]).to eql(@reservation.user.id)
+        # se deixar só com "user" .to eql @resevation.user vem igual porém com 3 campos a mais
+        # por isso tive que buscar o user mais especificamente
+      end
     end
   end
 
@@ -54,19 +71,6 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
         expect(@reservation.checkin_date).to eql(new_reservation_params[:reservation][:checkin_date])
         expect(@reservation.checkout_date).to eql(new_reservation_params[:reservation][:checkout_date])
         expect(@reservation.user).to eql(@user)
-      end
-
-      it "create a reservation with correspondents json fields" do
-        post :create, params: {reservation: {property_id: @property1.id, checkin_date: Date.today - 10.day, checkout_date: Date.today + 10.day}}
-        @reservation = Reservation.last
-        get :my_reservations
-
-
-        expect(JSON.parse(response.body).count).to eql(1)
-        expect(JSON.parse(response.body)[0]["property"]["id"]).to eql(@reservation.property_id)
-        # expect(@reservation.checkin_date).to eql(JSON.parse(response.body)[0]["reservation"]["checkin_date"])
-        # expect(@reservation.checkout_date).to eql(JSON.parse(response.body)[0]["reservation"]["checkout_date"])
-        # expect(@reservation.user).to eql(JSON.parse(response.body)[0]["user"])
       end
     end
   end

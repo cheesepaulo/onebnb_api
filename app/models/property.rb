@@ -45,7 +45,19 @@ class Property < ApplicationRecord
   def get_rating
     self.rating.round
   end
-end
+
+  def is_available? checkin_date, checkout_date
+     self.reservations.where(status: [:pending, :active].each do |reservation|
+       if reservation.checkin_date.between?(checkin_date, checkout_date) or
+          reservation.checkout_date.between?(checkin_date, checkout_date) or
+          checkin_date.between?(reservation.checkin_date, reservation.checkout_date) or
+          checkout_date.between?(reservation.checkin_date, reservation.checkout_date)
+         return false
+       end
+     end
+     true
+    end
+  end
 
 class String
      def to_b

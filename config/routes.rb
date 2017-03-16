@@ -31,6 +31,7 @@ Rails.application.routes.draw do
         member do
           post   'wishlist', to: 'properties#add_to_wishlist'
           delete 'wishlist', to: 'properties#remove_from_wishlist'
+          get 'check_availability', to: 'properties#check_availability'
         end
       end
 

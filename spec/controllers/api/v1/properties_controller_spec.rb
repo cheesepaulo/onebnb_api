@@ -1,6 +1,57 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::PropertiesController, type: :controller do
+  describe "GET #check_availability" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+    end
+
+    context "A date with avaibility" do
+      before do
+        @property = create(:property)
+
+        @busy_period1 = {checkin_date: Date.today + 1.day, checkout_date: Date.today + 2.day}
+        @busy_period2 = {checkin_date: Date.today + 5.day, checkout_date: Date.today + 6.day}
+
+        @reservation1 = create(:reservation, property: @property, checkin_date: @busy_period1[:checkin_date], checkout_date: @busy_period1[:checkout_date])
+        @reservation2 = create(:reservation, property: @property, checkin_date: @busy_period2[:checkin_date], checkout_date: @busy_period2[:checkin_date])
+
+        request.headers.merge!(@auth_headers)
+      end
+
+      it "return true" do
+        get :check_availability, params: {id: @property.id, checkin_date: (Date.today + 3.day).strftime("%d/%m/%Y"), checkout_date: (Date.today + 4.day).strftime("%d/%m/%Y")}
+        expect(JSON.parse(response.body)["success"]).to eql(true)
+      end
+
+      it "return status 200" do
+        get :check_availability, params: {id: @property.id, checkin_date: (Date.today + 3.day).strftime("%d/%m/%Y"), checkout_date: (Date.today + 4.day).strftime("%d/%m/%Y")}
+        expect(response.status).to eql(200)
+      end
+    end
+
+    context "A date without avaibility" do
+      before do
+        @property = create(:property)
+
+        @busy_period1 = {checkin_date: Date.today + 1.day, checkout_date: Date.today + 2.day}
+        @busy_period2 = {checkin_date: Date.today + 5.day, checkout_date: Date.today + 6.day}
+
+        @reservation1 = create(:reservation, property: @property, checkin_date: @busy_period1[:checkin_date], checkout_date: @busy_period1[:checkout_date])
+        @reservation2 = create(:reservation, property: @property, checkin_date: @busy_period2[:checkin_date], checkout_date: @busy_period2[:checkin_date])
+
+        request.headers.merge!(@auth_headers)
+      end
+
+      it "return false" do
+        get :check_availability, params: {id: @property.id, checkin_date: (Date.today + 1.day).strftime("%d/%m/%Y"), checkout_date: (Date.today + 4.day).strftime("%d/%m/%Y")}
+        expect(JSON.parse(response.body)["success"]).to eql(false)
+      end
+    end
+  end
+
   describe "GET #my_properties" do
     before do
       @user = create(:user)

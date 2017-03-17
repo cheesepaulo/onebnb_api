@@ -1,0 +1,9 @@
+<h3>Pedido de Reserva cancelado</h3>
+<p><b><%= @reservation.user.name %></b> cancelou o pedido de reserva :(.</p>
+<p>O pedido era referente a sua propriedade <b><%= @reservation.property.name %></b> para o dia <b><%= @reservation.checkin_date %></b> até <b><%= @reservation.checkout_date %></b>.
+
+<p><b>Dica</b>: Alguns pedidos de reserva são cancelados pela demora do dono da propriedade em aceita-los, se for o caso, tente aceitar os próximos mais rapidamente :)</p>
+
+<h4>
+  <a href="http://localhost:4200">OneBnb</a>
+</h4>

@@ -18,6 +18,7 @@ class Api::V1::ReservationsController < ApplicationController
   def cancel
     begin
       @api_v1_reservation.update(status: :canceled)
+      Api::V1::ReservationMailer.cancel_reservation(@api_v1_reservation).deliver_now
       render json: {success: true}, status: 200
     rescue Exception => errors
       render json: errors, status: :unprocessable_entity

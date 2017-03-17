@@ -1,0 +1,12 @@
+<h3>Parabéns \o/</h3>
+<p>Você acaba de receber um novo pedido de reserva de <b><%= @reservation.user.name %></b>.</p>
+<p>Ele solicitou a reserva da sua propriedade <b><%= @reservation.property.name %></b> para o dia <b><%= @reservation.checkin_date %></b> até <b><%= @reservation.checkout_date %></b>.
+O valor total que você receberá por essa reserva será: <b>R$<%= @reservation.interval_of_days * @reservation.property.price %></b></p>
+
+<p>Para aceitar visite seu painel administrativo <a href="http://localhost:4200">clicando aqui</a></p>
+<p>Para ver o perfil dele <a href="http://localhost:4200/profile/<%= @reservation.user.id %>">clique aqui</a>.</p>
+
+
+<h4>
+  <a href="http://localhost:3000">OneBnb</a>
+</h4>

@@ -1,5 +1,6 @@
 class Api::V1::ReservationsController < ApplicationController
-  before_action :set_api_v1_reservation, only: [:evaluation, :create]
+  before_action :set_api_v1_reservation, only: [:evaluation, :cancel]
+  before_action :authenticate_api_v1_user!
 
   # GET /get_by_property
   # GET /get_by_property.json
@@ -7,6 +8,17 @@ class Api::V1::ReservationsController < ApplicationController
     begin
       @api_v1_reservation = current_api_v1_user.properties.find(params[:id]).reservations
       render template: '/api/v1/reservations/index', status: 200
+    rescue Exception => errors
+      render json: errors, status: :unprocessable_entity
+    end
+  end
+
+  # PUT /cancel
+  # PUT /cancel.json
+  def cancel
+    begin
+      @api_v1_reservation.update(status: :canceled)
+      render json: {success: true}, status: 200
     rescue Exception => errors
       render json: errors, status: :unprocessable_entity
     end
@@ -26,7 +38,9 @@ class Api::V1::ReservationsController < ApplicationController
   # POST /api/v1/reservation.json
   def create
     @api_v1_reservation = Reservation.new(reservation_params)
+
     if @api_v1_reservation.save
+      Api::V1::ReservationMailer.new_reservation(@api_v1_reservation).deliver_now
       render :show, status: :created
     else
       render json: @api_v1_reservation.errors, status: :unprocessable_entity

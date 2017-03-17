@@ -54,11 +54,11 @@ class Api::V1::PropertiesController < ApplicationController
     begin
       @properties = {}
       # Próximas
-      @properties[:next] = current_api_v1_user.reservations.where(status: :active).map {|r| r.property}
+      @properties[:next] = current_api_v1_user.reservations.where(status: :active).map {|r| {property: r.property, reservation: r}}
       # Anteriores
-      @properties[:previous] = current_api_v1_user.reservations.where(status: :finished).map {|r| r.property}
+      @properties[:previous] = current_api_v1_user.reservations.where(status: :finished).map {|r| {property: r.property, reservation: r}}
       # Pending
-      @properties[:pending] = current_api_v1_user.reservations.where(status: :pending).map {|r| r.property}
+      @properties[:pending] = current_api_v1_user.reservations.where(status: :pending).map {|r| {property: r.property, reservation: r}}
       # Wishlist
       @properties[:wishlist] = current_api_v1_user.wishlists.map {|w| w.property}
     rescue Exception => errors

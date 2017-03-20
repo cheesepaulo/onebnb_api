@@ -4,9 +4,14 @@ class Property < ApplicationRecord
   # Os tipos de acomodação: casa inteira, quarto inteiro e quarto compartilhado
   enum accommodation_type: [ :whole_house, :whole_bedroom, :shared_bedroom ]
 
+
   belongs_to :user
   belongs_to :address
   belongs_to :facility
+
+  accepts_nested_attributes_for :address
+  accepts_nested_attributes_for :facility
+
   has_many :wishlists
   has_many :photos
   has_many :reservations
@@ -19,7 +24,7 @@ class Property < ApplicationRecord
   searchkick
 
   # Força a ter esses campos preenchidos para criar um Property
-  validates_presence_of :address, :facility, :user, :status, :price, :photos,
+  validates_presence_of :address, :facility, :user, :status, :price,
                         :accommodation_type, :beds, :bedroom, :bathroom, :guest_max,
                         :description
 
@@ -27,7 +32,6 @@ class Property < ApplicationRecord
     {
       name: name,
       status: status,
-      accommodation_type: accommodation_type,
       address_country: address.country,
       address_city: address.city,
       address_state: address.state,
@@ -47,17 +51,17 @@ class Property < ApplicationRecord
   end
 
   def is_available? checkin_date, checkout_date
-    self.reservations.where(status: [:active, :pending]).each do |reservation|
+    self.reservations.where(status: [:pending, :active]).each do |reservation|
       if reservation.checkin_date.between?(checkin_date, checkout_date) or
-        reservation.checkout_date.between?(checkin_date, checkout_date) or
-        checkin_date.between?(reservation.checkin_date, reservation.checkout_date) or
-        checkout_date.between?(reservation.checkin_date, reservation.checkout_date)
+         reservation.checkout_date.between?(checkin_date, checkout_date) or
+         checkin_date.between?(reservation.checkin_date, reservation.checkout_date) or
+         checkout_date.between?(reservation.checkin_date, reservation.checkout_date)
         return false
-        end
       end
-    true
     end
+  true
   end
+end
 
   class String
      def to_b

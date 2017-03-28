@@ -1,6 +1,110 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::ReservationsController, type: :controller do
+  describe "POST #refuse" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+      ActionMailer::Base.deliveries = []
+    end
+
+    context "User is property owner" do
+      before do
+        request.headers.merge!(@auth_headers)
+        @property = create(:property, user: @user)
+        @reservation = create(:reservation, status: :pending, property: @property)
+      end
+
+      it "Change status of pending to refused" do
+        put :refuse, params: {id: @reservation.id}
+        @reservation.reload
+        expect(@reservation.status).to eql("refused")
+      end
+
+      it "Receive status 200" do
+        put :refuse, params: {id: @reservation.id}
+        expect(response.status).to eql(200)
+      end
+
+      it "will send a notification mail to Reservation User" do
+        put :refuse, params: {id: @reservation.id}
+        expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect(ActionMailer::Base.deliveries.last.to).to eq([Reservation.last.user.email])
+      end
+    end
+
+    context "User is not the owner of the Property" do
+      before do
+        request.headers.merge!(@auth_headers)
+        @reservation = create(:reservation, status: :pending)
+      end
+
+      it "Status keep pending" do
+        post :refuse, params: {id: @reservation.id}
+        @reservation.reload
+        expect(@reservation.status).to eql("pending")
+      end
+
+      it "Receive status 422" do
+        post :refuse, params: {id: @reservation.id}
+        expect(response.status).to eql(403)
+      end
+    end
+  end
+
+  describe "POST #accept" do
+    before do
+      @user = create(:user)
+      @auth_headers = @user.create_new_auth_token
+      request.env["HTTP_ACCEPT"] = 'application/json'
+      ActionMailer::Base.deliveries = []
+    end
+
+    context "User is property owner" do
+      before do
+        request.headers.merge!(@auth_headers)
+        @property = create(:property, user: @user)
+        @reservation = create(:reservation, status: :pending, property: @property)
+      end
+
+      it "Change status of pending to active" do
+        put :accept, params: {id: @reservation.id}
+        @reservation.reload
+        expect(@reservation.status).to eql("active")
+      end
+
+      it "Receive status 200" do
+        put :accept, params: {id: @reservation.id}
+        expect(response.status).to eql(200)
+      end
+
+      it "will send a notification mail to Reservation User" do
+        put :accept, params: {id: @reservation.id}
+        expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect(ActionMailer::Base.deliveries.last.to).to eq([@reservation.user.email])
+      end
+    end
+
+    context "User is not the owner of the Property" do
+      before do
+        request.headers.merge!(@auth_headers)
+        @reservation = create(:reservation, status: :pending)
+      end
+
+      it "Status keep pending" do
+        put :accept, params: {id: @reservation.id}
+        @reservation.reload
+        expect(@reservation.status).to eql("pending")
+      end
+
+      it "Receive status 422" do
+        put :accept, params: {id: @reservation.id}
+        expect(response.status).to eql(403)
+      end
+    end
+  end
+
   describe "POST #cancel" do
     before do
       @user = create(:user)
@@ -12,6 +116,7 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
       before do
         request.headers.merge!(@auth_headers)
         @reservation = create(:reservation, user: @user, status: :pending)
+        ActionMailer::Base.deliveries = []
       end
 
       it "Change status of pending to canceled" do
@@ -28,7 +133,6 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
       it "will send a notification mail to Property Owner" do
         post :cancel, params: {id: @reservation.id}
         expect(ActionMailer::Base.deliveries.count).to eql(1)
-        # FIXME está contando os emails dos testes de cima ^, tem que zerar o deliveries de alguma maneira
         expect(ActionMailer::Base.deliveries.last.to).to eql([Reservation.last.property.user.email])
       end
     end
@@ -47,6 +151,7 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
 
       it "Receive status 422" do
         post :cancel, params: {id: @reservation.id}
+        puts response.status
         expect(response.status).to eql(422)
       end
     end
@@ -78,17 +183,11 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
         get :get_by_property, params: {id: @property1.id}
         @reservation = Reservation.last
 
-        puts @reservation.user.id
-        puts JSON.parse(response.body)[3]
-        # o user id é igual ao retornado no response
-
         expect(JSON.parse(response.body).count).to eql(4)
         expect(JSON.parse(response.body)[3]["property_id"]).to eql(@reservation.property_id)
         expect(JSON.parse(response.body)[3]["checkin_date"]).to eql(@reservation.checkin_date.strftime)
         expect(JSON.parse(response.body)[3]["checkout_date"]).to eql(@reservation.checkout_date.strftime)
-        expect(JSON.parse(response.body)[3]["user"]["user_id"]).to eql(@reservation.user.id)
-        # se deixar só com "user" .to eql @resevation.user vem igual porém com 3 campos a mais
-        # por isso tive que buscar o user mais especificamente
+        expect(JSON.parse(response.body)[3]["user"]["id"]).to eql(@reservation.user.id)
       end
     end
   end
@@ -104,6 +203,7 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
       before do
         request.headers.merge!(@auth_headers)
         @property1 = create(:property, status: :active, rating: 5)
+        ActionMailer::Base.deliveries = []
       end
 
       it "will send a notification mail to Property Owner" do

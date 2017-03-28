@@ -1,6 +1,8 @@
 class Api::V1::ReservationsController < ApplicationController
-  before_action :set_api_v1_reservation, only: [:evaluation, :cancel]
+  before_action :set_api_v1_reservation, only: [:evaluation, :cancel, :accept, :refuse]
   before_action :authenticate_api_v1_user!
+  before_action :is_property_owner?, only: [:accept, :refuse]
+  before_action :is_owner?, only: [:evaluation, :cancel]
 
   # GET /get_by_property
   # GET /get_by_property.json
@@ -22,6 +24,28 @@ class Api::V1::ReservationsController < ApplicationController
       render json: {success: true}, status: 200
     rescue Exception => errors
       render json: errors, status: :unprocessable_entity
+    end
+  end
+
+  # PUT /refuse
+  # PUT /refuse.json
+  def refuse
+    begin
+      @api_v1_reservation.update(status: :refused)
+      Api::V1::ReservationMailer.refused_reservation(@api_v1_reservation).deliver_now
+      render json: {success: true}, status: 200
+    rescue Exception => errors
+      render json: errors, status: :unprocessable_entity
+    end
+  end
+
+  # POST /api/v1/accept.json
+  def accept
+    if @api_v1_reservation.update(status: :active)
+      Api::V1::ReservationMailer.accepted_reservation(@api_v1_reservation).deliver_now
+      render :show, status: :ok
+    else
+      render json: @api_v1_reservation.errors, status: :unprocessable_entity
     end
   end
 
@@ -50,15 +74,27 @@ class Api::V1::ReservationsController < ApplicationController
 
   private
 
-    def set_api_v1_reservation
-      @api_v1_reservation = Reservation.where(id: params[:id], user: current_api_v1_user).last
-    end
-
     def reservation_params
       params.require(:reservation).permit(:property_id, :checkin_date, :checkout_date).merge(user_id: current_api_v1_user.id)
     end
 
     def evaluation_params
       params.require(:evaluation).permit(:comment, :rating)
+    end
+
+    def set_api_v1_reservation
+      @api_v1_reservation = Reservation.find(params[:id])
+    end
+
+    def is_property_owner?
+      unless @api_v1_reservation.property.user == current_api_v1_user
+        render json: {}, status: :forbidden
+      end
+    end
+
+    def is_owner?
+      unless @api_v1_reservation.user == current_api_v1_user
+        render json: {}, status: :forbidden
+      end
     end
 end

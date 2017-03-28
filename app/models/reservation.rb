@@ -1,5 +1,5 @@
 class Reservation < ApplicationRecord
-  enum status: [ :pending, :active, :finished, :paid, :canceled ]
+  enum status: [ :pending, :active, :finished, :paid, :canceled , :refused]
   belongs_to :property
   belongs_to :user
 

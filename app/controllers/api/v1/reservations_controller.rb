@@ -1,6 +1,6 @@
 class Api::V1::ReservationsController < ApplicationController
-  before_action :set_api_v1_reservation, only: [:evaluation, :cancel, :accept, :refuse]
   before_action :authenticate_api_v1_user!
+  before_action :set_api_v1_reservation, only: [:evaluation, :cancel, :accept, :refuse]
   before_action :is_property_owner?, only: [:accept, :refuse]
   before_action :is_owner?, only: [:evaluation, :cancel]
 

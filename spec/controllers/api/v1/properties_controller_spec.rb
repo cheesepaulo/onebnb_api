@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::PropertiesController, type: :controller do
+  include Requests::JsonHelpers
+
   describe "GET #check_availability" do
     before do
       @user = create(:user)
@@ -23,12 +25,12 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
 
       it "return true" do
         get :check_availability, params: {id: @property.id, checkin_date: (Date.today + 3.day).strftime("%d/%m/%Y"), checkout_date: (Date.today + 4.day).strftime("%d/%m/%Y")}
-        expect(JSON.parse(response.body)["success"]).to eql(true)
+        expect(json[:success]).to eql(true)
       end
 
       it "return status 200" do
         get :check_availability, params: {id: @property.id, checkin_date: (Date.today + 3.day).strftime("%d/%m/%Y"), checkout_date: (Date.today + 4.day).strftime("%d/%m/%Y")}
-        expect(response.status).to eql(200)
+        expect_status(200)
       end
     end
 
@@ -47,7 +49,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
 
       it "return false" do
         get :check_availability, params: {id: @property.id, checkin_date: (Date.today + 1.day).strftime("%d/%m/%Y"), checkout_date: (Date.today + 4.day).strftime("%d/%m/%Y")}
-        expect(JSON.parse(response.body)["success"]).to eql(false)
+        expect(json[:success]).to eql(false)
       end
     end
   end
@@ -76,15 +78,15 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
 
       it "return 4 properties" do
         get :my_properties
-        expect(JSON.parse(response.body).count).to eql(4)
+        expect(json.count).to eql(4)
       end
 
       it "return by last reservation order" do
         get :my_properties
-        expect(@property1.id).to eql(JSON.parse(response.body)[3]["property"]["id"])
-        expect(@property2.id).to eql(JSON.parse(response.body)[2]["property"]["id"])
-        expect(@property3.id).to eql(JSON.parse(response.body)[1]["property"]["id"])
-        expect(@property4.id).to eql(JSON.parse(response.body)[0]["property"]["id"])
+        expect(@property1.id).to eql(json[3][:property][:id])
+        expect(@property2.id).to eql(json[2][:property][:id])
+        expect(@property3.id).to eql(json[1][:property][:id])
+        expect(@property4.id).to eql(json[0][:property][:id])
       end
     end
   end
@@ -123,30 +125,30 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
 
       it "return 2 properties in 'next' trips and right properties" do
         get :trips
-        expect(JSON.parse(response.body)["trips"]["next"].count).to eql(2)
-        expect(JSON.parse(response.body)["trips"]["next"][0]['id']).to eql(@next1.property.id)
-        expect(JSON.parse(response.body)["trips"]["next"][1]['id']).to eql(@next2.property.id)
+        expect(json[:trips][:next].count).to eql(2)
+        expect(json[:trips][:next][0][:id]).to eql(@next1.property.id)
+        expect(json[:trips][:next][1][:id]).to eql(@next2.property.id)
       end
 
       it "return 2 properties in 'previous' trips" do
         get :trips
-        expect(JSON.parse(response.body)["trips"]["previous"].count).to eql(2)
-        expect(JSON.parse(response.body)["trips"]["previous"][0]['id']).to eql(@previous1.property.id)
-        expect(JSON.parse(response.body)["trips"]["previous"][1]['id']).to eql(@previous2.property.id)
+        expect(json[:trips][:previous].count).to eql(2)
+        expect(json[:trips][:previous][0][:id]).to eql(@previous1.property.id)
+        expect(json[:trips][:previous][1][:id]).to eql(@previous2.property.id)
       end
 
       it "return 2 properties in 'pending' trips" do
         get :trips
-        expect(JSON.parse(response.body)["trips"]["pending"].count).to eql(2)
-        expect(JSON.parse(response.body)["trips"]["pending"][0]['id']).to eql(@pending1.property.id)
-        expect(JSON.parse(response.body)["trips"]["pending"][1]['id']).to eql(@pending2.property.id)
+        expect(json[:trips][:pending].count).to eql(2)
+        expect(json[:trips][:pending][0][:id]).to eql(@pending1.property.id)
+        expect(json[:trips][:pending][1][:id]).to eql(@pending2.property.id)
       end
 
       it "return 2 properties in the wishlist" do
         get :trips
-        expect(JSON.parse(response.body)["trips"]["wishlist"].count).to eql(2)
-        expect(JSON.parse(response.body)["trips"]["wishlist"][0]['id']).to eql(@wishlist1.property.id)
-        expect(JSON.parse(response.body)["trips"]["wishlist"][1]['id']).to eql(@wishlist2.property.id)
+        expect(json[:trips][:wishlist].count).to eql(2)
+        expect(json[:trips][:wishlist][0][:id]).to eql(@wishlist1.property.id)
+        expect(json[:trips][:wishlist][1][:id]).to eql(@wishlist2.property.id)
       end
     end
   end
@@ -172,9 +174,9 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
 
         it "return the 3 properties thar are priority" do
           get :featured
-          expect(JSON.parse(response.body)[0]["property"]["priority"]).to eql(true)
-          expect(JSON.parse(response.body)[1]["property"]["priority"]).to eql(true)
-          expect(JSON.parse(response.body)[2]["property"]["priority"]).to eql(true)
+          expect(json[0][:property][:priority]).to eql(true)
+          expect(json[1][:property][:priority]).to eql(true)
+          expect(json[2][:property][:priority]).to eql(true)
         end
       end
 
@@ -189,9 +191,9 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
 
         it "return 2 properties with priority and 1 without priority" do
           get :featured
-          expect(JSON.parse(response.body)[0]["property"]["priority"]).to eql(true)
-          expect(JSON.parse(response.body)[1]["property"]["priority"]).to eql(true)
-          expect(JSON.parse(response.body)[2]["property"]["priority"]).to eql(false)
+          expect(json[0][:property][:priority]).to eql(true)
+          expect(json[1][:property][:priority]).to eql(true)
+          expect(json[2][:property][:priority]).to eql(false)
         end
       end
     end
@@ -220,7 +222,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
     context "with invalid tokens" do
       it "can't add to wishlist" do
         post :add_to_wishlist, params: {id: @property.id}
-        expect(response.status).to eql(401)
+        expect_status(401)
       end
     end
   end
@@ -249,7 +251,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
     context "with invalid tokens" do
       it "can't add to wishlist" do
         delete :remove_from_wishlist, params: {id: @property.id}
-        expect(response.status).to eql(401)
+        expect_status(401)
       end
 
       it "whishlist keep existing" do
@@ -272,7 +274,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         Property.reindex
 
         get :search, params: {search: 'Sao Paulo'}
-        expect(JSON.parse(response.body).count).to eql(1)
+        expect(json.count).to eql(1)
       end
 
       it "receive zero result when property not active" do
@@ -282,7 +284,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         Property.reindex
 
         get :search, params: {search: 'Sao Paulo'}
-        expect(JSON.parse(response.body).count).to eql(0)
+        expect(json.count).to eql(0)
       end
 
       it "it receive one result when property is active and wifi is enable" do
@@ -297,7 +299,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         Property.reindex
 
         get :search, params: {search: 'Sao Paulo', wifi: true}
-        expect(JSON.parse(response.body).count).to eql(1)
+        expect(json.count).to eql(1)
       end
 
       it "receive one result when property is active and accommodation_type is wholehouse" do
@@ -308,8 +310,8 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         Property.reindex
 
         get :search, params: {search: 'Sao Paulo', whole_house: true}
-        expect(JSON.parse(response.body)[0]["property"]["accommodation_type"]).to eql("whole_house")
-        expect(JSON.parse(response.body).count).to eql(1)
+        expect(json[0][:property][:accommodation_type]).to eql("whole_house")
+        expect(json.count).to eql(1)
       end
     end
 
@@ -321,7 +323,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         Property.reindex
 
         get :search, params: {search: 'Manaus'}
-        expect(JSON.parse(response.body).count).to eql(0)
+        expect(json.count).to eql(0)
       end
     end
   end

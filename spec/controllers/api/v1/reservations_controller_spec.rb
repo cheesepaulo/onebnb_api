@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::ReservationsController, type: :controller do
+  include Requests::JsonHelpers
+  include Requests::HeaderHelpers
+
   describe "POST #refuse" do
     before do
       @user = create(:user)
@@ -24,7 +27,7 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
 
       it "Receive status 200" do
         put :refuse, params: {id: @reservation.id}
-        expect(response.status).to eql(200)
+        expect_status(200)
       end
 
       it "will send a notification mail to Reservation User" do
@@ -48,22 +51,20 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
 
       it "Receive status 422" do
         post :refuse, params: {id: @reservation.id}
-        expect(response.status).to eql(403)
+        expect_status(403)
       end
     end
   end
 
-  describe "POST #accept" do
+  describe "PUT #accept" do
     before do
       @user = create(:user)
-      @auth_headers = @user.create_new_auth_token
-      request.env["HTTP_ACCEPT"] = 'application/json'
+      request.headers.merge!(header_with_authentication @user)
       ActionMailer::Base.deliveries = []
     end
 
     context "User is property owner" do
       before do
-        request.headers.merge!(@auth_headers)
         @property = create(:property, user: @user)
         @reservation = create(:reservation, status: :pending, property: @property)
       end
@@ -76,7 +77,7 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
 
       it "Receive status 200" do
         put :accept, params: {id: @reservation.id}
-        expect(response.status).to eql(200)
+        expect_status(200)
       end
 
       it "will send a notification mail to Reservation User" do
@@ -100,7 +101,7 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
 
       it "Receive status 422" do
         put :accept, params: {id: @reservation.id}
-        expect(response.status).to eql(403)
+        expect_status(403)
       end
     end
   end
@@ -152,7 +153,7 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
       it "Receive status 422" do
         post :cancel, params: {id: @reservation.id}
         puts response.status
-        expect(response.status).to eql(422)
+        expect_status(422)
       end
     end
   end
@@ -176,18 +177,19 @@ RSpec.describe Api::V1::ReservationsController, type: :controller do
 
       it "receive 4 reservations" do
         get :get_by_property, params: {id: @property1.id}
-        expect(JSON.parse(response.body).count).to eql(4)
+        expect(json.count).to eql(4)
       end
 
       it "get a reservation with correspondents json fields" do
         get :get_by_property, params: {id: @property1.id}
         @reservation = Reservation.last
 
-        expect(JSON.parse(response.body).count).to eql(4)
-        expect(JSON.parse(response.body)[3]["property_id"]).to eql(@reservation.property_id)
-        expect(JSON.parse(response.body)[3]["checkin_date"]).to eql(@reservation.checkin_date.strftime)
-        expect(JSON.parse(response.body)[3]["checkout_date"]).to eql(@reservation.checkout_date.strftime)
-        expect(JSON.parse(response.body)[3]["user"]["id"]).to eql(@reservation.user.id)
+        expect(json.count).to eql(4)
+
+        expect(json[3][:property_id]).to eql(@reservation.property_id)
+        expect(json[3][:checkin_date]).to eql(@reservation.checkin_date.strftime)
+        expect(json[3][:checkout_date]).to eql(@reservation.checkout_date.strftime)
+        expect(json[3][:user][:id]).to eql(@reservation.user.id)
       end
     end
   end

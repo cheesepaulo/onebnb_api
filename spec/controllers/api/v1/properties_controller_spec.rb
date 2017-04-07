@@ -41,9 +41,8 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         @busy_period1 = {checkin_date: Date.today + 1.day, checkout_date: Date.today + 2.day}
         @busy_period2 = {checkin_date: Date.today + 5.day, checkout_date: Date.today + 6.day}
 
-        @reservation1 = create(:reservation, property: @property, checkin_date: @busy_period1[:checkin_date], checkout_date: @busy_period1[:checkout_date])
-        @reservation2 = create(:reservation, property: @property, checkin_date: @busy_period2[:checkin_date], checkout_date: @busy_period2[:checkin_date])
-
+        @reservation1 = create(:reservation, property: @property, checkin_date: @busy_period1[:checkin_date], checkout_date: @busy_period1[:checkout_date], status: :active)
+        @reservation2 = create(:reservation, property: @property, checkin_date: @busy_period2[:checkin_date], checkout_date: @busy_period2[:checkin_date], status: :active)
         request.headers.merge!(@auth_headers)
       end
 
@@ -310,7 +309,7 @@ RSpec.describe Api::V1::PropertiesController, type: :controller do
         Property.reindex
 
         get :search, params: {search: 'Sao Paulo', whole_house: true}
-        expect(json[0][:property][:accommodation_type]).to eql("whole_house")
+        expect(json[0][:property][:accommodation_type]).to eql(:whole_house)
         expect(json.count).to eql(1)
       end
     end

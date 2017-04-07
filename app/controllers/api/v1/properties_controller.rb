@@ -105,9 +105,11 @@ class Api::V1::PropertiesController < ApplicationController
     conditions['refrigerato'] = params[:refrigerato].to_b if params[:refrigerato].present?
     conditions['heater'] = params[:heater].to_b if params[:heater].present?
 
-    conditions['accommodation_type'] = 'whole_house' if params[:whole_house] == 'true'
-    conditions['accommodation_type'] = 'whole_bedroom' if params[:whole_bedroom] == 'true'
-    conditions['accommodation_type'] = 'shared_bedroom' if params[:shared_bedroom] == 'true'
+    conditions['accommodation_type'] = :whole_house if params[:whole_house] == 'true'
+    conditions['accommodation_type'] = :whole_bedroom if params[:whole_bedroom] == 'true'
+    conditions['accommodation_type'] = :shared_bedroom if params[:shared_bedroom] == 'true'
+
+    puts Property.search search_condition
 
     # Realizamos a busca do ElasticSearch
     @api_v1_properties = (Property.search search_condition, where: conditions,  page: page, per_page: 18)
